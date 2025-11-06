@@ -16,7 +16,10 @@ func main(){
 		fmt.Println("We have a total of", conferenceTickets, "tickets and", remainingTickets, "are still available.")
 		fmt.Println("Get your tickets here to attend")
 
-		var (firstName string; lastName string; userTickets int; email string)
+		var (firstName string
+			 lastName string
+			 userTickets int
+			 email string)
 
 		fmt.Print("Enter your first name:")
 		fmt.Scan(&firstName)
@@ -24,11 +27,31 @@ func main(){
 		fmt.Print("Enter your last name:")
 		fmt.Scan(&lastName)
 
+		isValidName:=len(firstName)>=2 && len(lastName)>=2
+		if(!isValidName){
+			fmt.Println("First name or last name you entered is too short")
+			continue
+		}
+
 		fmt.Print("Enter your email:")
 		fmt.Scan(&email)
 
+		isValidEmail:=strings.Contains(email,"@") && strings.Contains(email,".")
+
+		if(!isValidEmail){
+			fmt.Println("Email address you entered is invalid")
+			continue
+		}
+
 		fmt.Print("Enter the number of tickets:")
 		fmt.Scan(&userTickets)
+
+		isValidTicketNumber:=userTickets>0 && userTickets<=int(remainingTickets)
+
+		if(!isValidTicketNumber){
+			fmt.Printf("The number of tickets you entered is invalid. We have %v tickets remaining\n",remainingTickets)
+			continue
+		}
 
 		remainingTickets-=uint(userTickets)
 		bookings=append(bookings,firstName+" "+lastName)
