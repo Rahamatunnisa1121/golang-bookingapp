@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"golang-bookingapp/helper"
 	"strings"
 )
 
@@ -12,16 +13,15 @@ var remainingTickets uint =50
 var bookings = []string{}
 func main(){
 	greetUser()
-
 	for{
 		printAvailableTickets()
 
 		firstName,lastName,email,userTickets:=getUserInput()
-		isValidName, isValidEmail, isValidTicketNumber:=validateUserInput(firstName,lastName,email,userTickets,remainingTickets)
+		isValidName, isValidEmail, isValidTicketNumber:=helper.ValidateUserInput(firstName,lastName,email,userTickets,remainingTickets)
 
 		if(isValidName && isValidEmail && isValidTicketNumber){
 			bookTickets(userTickets,firstName,lastName,email)
-			firstNames:=getFirstNames(bookings)
+			firstNames:=getFirstNames()
 			fmt.Println("The first names of bookings are:",firstNames)
 			if remainingTickets==0{
 				fmt.Println("Our conference is booked out. Come back next year")
@@ -60,12 +60,7 @@ func getUserInput()(string,string,string,int){
 	fmt.Scan(&userTickets)
 	return firstName,lastName,email,userTickets
 }
-func validateUserInput(firstName string,lastName string,email string,userTickets int,remainingTickets uint)(bool,bool,bool){
-	isValidName:= len(firstName)>=2 && len(lastName)>=2
-	isValidEmail:= strings.Contains(email,"@") && strings.Contains(email,".")
-	isValidTicketNumber:= userTickets>0 && userTickets<=int(remainingTickets)
-	return isValidName,isValidEmail,isValidTicketNumber
-}
+
 func bookTickets(userTickets int,firstName string,lastName string,email string){
 	//update remaining tickets
 	remainingTickets-=uint(userTickets)
@@ -75,7 +70,7 @@ func bookTickets(userTickets int,firstName string,lastName string,email string){
 	fmt.Printf("The remaining tickets are %v\n",remainingTickets)
 }
 
-func getFirstNames(bookings []string) []string{
+func getFirstNames() []string{
 	firstNames:=[]string{}
 		for _,booking:=range bookings{
 			var firstName=strings.Fields(booking)[0]
