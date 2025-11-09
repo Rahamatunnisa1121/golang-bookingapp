@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"golang-bookingapp/helper"
+	"strconv"
 	"strings"
 )
 
@@ -10,14 +10,14 @@ import (
 const conferenceTickets int = 50
 const conferenceName string = "GO CONFERENCE"
 var remainingTickets uint =50
-var bookings = []string{}
+var bookings =make([]map[string]string,0)//as it is a slice of maps
 func main(){
 	greetUser()
 	for{
 		printAvailableTickets()
 
 		firstName,lastName,email,userTickets:=getUserInput()
-		isValidName, isValidEmail, isValidTicketNumber:=helper.ValidateUserInput(firstName,lastName,email,userTickets,remainingTickets)
+		isValidName, isValidEmail, isValidTicketNumber:=validateUserInput(firstName,lastName,email,userTickets)
 
 		if(isValidName && isValidEmail && isValidTicketNumber){
 			bookTickets(userTickets,firstName,lastName,email)
@@ -60,20 +60,31 @@ func getUserInput()(string,string,string,int){
 	fmt.Scan(&userTickets)
 	return firstName,lastName,email,userTickets
 }
-
+func validateUserInput(firstName string,lastName string,email string,userTickets int)(bool,bool,bool){
+	isValidName:= len(firstName)>=2 && len(lastName)>=2
+	isValidEmail:= strings.Contains(email,"@") && strings.Contains(email,".")
+	isValidTicketNumber:= userTickets>0 && userTickets<=int(remainingTickets)
+	return isValidName,isValidEmail,isValidTicketNumber
+}
 func bookTickets(userTickets int,firstName string,lastName string,email string){
 	//update remaining tickets
 	remainingTickets-=uint(userTickets)
-	bookings=append(bookings,firstName+" "+lastName)
+	var userData=make(map[string]string)
+	userData["firstName"]=firstName
+	userData["lastName"]=lastName
+	userData["email"]=email
+	userData["userTickets"]=strconv.FormatUint(uint64(userTickets),10)
+	bookings=append(bookings,userData)
 	fmt.Printf("Thankyou %v for booking %v tickets\n",firstName+" "+lastName,userTickets)
 	fmt.Printf("You will receive a confirmation email at %v shortly\n",email)
 	fmt.Printf("The remaining tickets are %v\n",remainingTickets)
+	fmt.Printf("The bookings are %v\n",bookings)
 }
 
 func getFirstNames() []string{
 	firstNames:=[]string{}
 		for _,booking:=range bookings{
-			var firstName=strings.Fields(booking)[0]
+			var firstName=booking["firstName"]
 			firstNames=append(firstNames,firstName)
 		}
 		return firstNames
