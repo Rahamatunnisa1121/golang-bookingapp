@@ -29,7 +29,8 @@ func main(){
 
 		if(isValidName && isValidEmail && isValidTicketNumber){
 			bookTickets(userTickets,firstName,lastName,email)
-			sendTicket(uint(userTickets),firstName,lastName,email)
+			//to make it async
+			go sendTicket(uint(userTickets),firstName,lastName,email)
 			firstNames:=getFirstNames()
 			fmt.Println("The first names of bookings are:",firstNames)
 			if remainingTickets==0{
