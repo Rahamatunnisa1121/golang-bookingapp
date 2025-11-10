@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 )
-
+var wg=sync.WaitGroup{}
 //in global scope, we cannot use := operator
 const conferenceTickets int = 50
 const conferenceName string = "GO CONFERENCE"
@@ -21,7 +22,7 @@ type UserData struct{
 
 func main(){
 	greetUser()
-	for{
+	//for{
 		printAvailableTickets()
 
 		firstName,lastName,email,userTickets:=getUserInput()
@@ -30,25 +31,28 @@ func main(){
 		if(isValidName && isValidEmail && isValidTicketNumber){
 			bookTickets(userTickets,firstName,lastName,email)
 			//to make it async
+			wg.Add(1) //increment the counter when new goroutine is started
+			//it increases waitgroup counter by provided number
 			go sendTicket(uint(userTickets),firstName,lastName,email)
 			firstNames:=getFirstNames()
 			fmt.Println("The first names of bookings are:",firstNames)
 			if remainingTickets==0{
 				fmt.Println("Our conference is booked out. Come back next year")
-				break
+				//break
 			}
 		}else if(!isValidName){
 			fmt.Println("First name or last name you entered is too short")
-			continue
+			//continue
 		}else if(!isValidEmail){
 			fmt.Println("Email address you entered is invalid")
-			continue	
+			//continue	
 		}else if(!isValidTicketNumber){
 			fmt.Println("Number of tickets you entered is invalid")
-			continue
+			//continue
 		}
-	}
+	wg.Wait() //wait for all goroutines to finish
 }
+//}
 func greetUser(){
 	fmt.Printf("Welcome to %v booking application!\n",conferenceName)
 }
@@ -107,4 +111,5 @@ func sendTicket(userTickets uint,firstName string,lastName string,email string){
 	fmt.Println("####################")
 	fmt.Printf("Sending ticket:\n %v \nto email address %v\n",ticket,email)
 	fmt.Println("####################")
+	wg.Done() //decrement the counter when goroutine is completed
 }
